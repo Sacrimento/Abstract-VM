@@ -7,6 +7,7 @@ using namespace std;
 
 int     main(int argc, char **argv)
 {
+    (void)argc;
     std::list<Parser::token>    tokens = Parser::parseFile(argv[1]);
 
     if (tokens.empty())

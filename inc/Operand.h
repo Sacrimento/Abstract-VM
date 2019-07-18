@@ -48,7 +48,7 @@ std::ostream	&operator<<(std::ostream & o, Operand<T> const & rhs)
 }
 
 template <typename T>
-Operand<T>::Operand(T value, eOperandType type, VM const *vm) : _type(type), _value(value), _vm(vm), _sValue(std::to_string(value)) {}
+Operand<T>::Operand(T value, eOperandType type, VM const *vm) : _value(value), _sValue(std::to_string(value)), _type(type), _vm(vm) {}
 
 template <typename T>
 Operand<T>::Operand(Operand<T> const & src)
