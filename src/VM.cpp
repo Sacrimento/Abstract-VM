@@ -1,6 +1,19 @@
 #include "../inc/VM.h"
 
-VM::VM() {}
+VM::VM()
+{
+    this->_instr = 
+    {
+        {"pop", &VM::pop},
+        {"dump", &VM::dump},
+        {"add", &VM::add},
+        {"sub", &VM::sub},
+        {"mul", &VM::mul},
+        {"div", &VM::div},
+        {"mod", &VM::mod},
+        {"print", &VM::print}
+    };
+}
 
 VM::~VM() {}
 
@@ -14,6 +27,26 @@ IOperand const  *VM::createOperand(eOperandType type, std::string const & value)
         &VM::createDouble
     };
     return (this->*funcs[type])(value);
+}
+
+void            VM::exec(std::list<Parser::token> tokens)
+{
+    for (auto t : tokens)
+    {
+        try
+        {
+            if (t.value.empty())
+                (this->*_instr[t.func])();
+            // else
+            //     this->_factory[t.func](t.value);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            return;
+        }
+        
+    }
 }
 
 IOperand const  *VM::createInt8( std::string const & value ) const
