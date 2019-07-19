@@ -1,9 +1,6 @@
 #include "../inc/VM.h"
 
-VM::VM()
-{
-    this->_instr = 
-    {
+VM::VM() : _instr({
         {"pop", &VM::pop},
         {"dump", &VM::dump},
         {"add", &VM::add},
@@ -11,11 +8,14 @@ VM::VM()
         {"mul", &VM::mul},
         {"div", &VM::div},
         {"mod", &VM::mod},
-        {"print", &VM::print}
-    };
-}
+        {"print", &VM::print},
+        {"assert", &VM::assert}}) {}
 
-VM::~VM() {}
+VM::~VM()
+{
+    for (auto op : this->_list)
+        delete op;
+}
 
 IOperand const  *VM::createOperand(eOperandType type, std::string const & value) const
 {
@@ -33,12 +33,13 @@ void            VM::exec(std::list<Parser::token> tokens)
 {
     for (auto t : tokens)
     {
+        // std::cout << t.func + " " + t.value + "\n";
         try
         {
             if (t.value.empty())
                 (this->*_instr[t.func])();
-            // else
-            //     this->_factory[t.func](t.value);
+            else
+                this->_list.push_front(this->createOperand(static_cast<eOperandType>(std::distance(Parser::allowedConstructor.begin(), std::find(Parser::allowedConstructor.begin(), Parser::allowedConstructor.end(), t.func))), t.value));
         }
         catch(const std::exception& e)
         {
@@ -47,6 +48,22 @@ void            VM::exec(std::list<Parser::token> tokens)
         }
         
     }
+}
+
+std::pair<IOperand const *, IOperand const *>   VM::getOperands(void)
+{
+    IOperand const *op1;
+    IOperand const *op2;
+
+    if (this->_list.size() < 2)
+        std::cout << "less than 2\n";
+
+    op1 = this->_list.front();
+    this->_list.pop_front();
+    op2 = this->_list.front();
+    this->_list.pop_front();
+
+    return std::make_pair(op1, op2);
 }
 
 IOperand const  *VM::createInt8( std::string const & value ) const
@@ -99,3 +116,71 @@ IOperand const  *VM::createDouble( std::string const & value ) const
     return new Operand<double>(val, AVM_DOUBLE, this);
 }
 
+void    VM::pop(void)
+{
+    if (this->_list.size() == 0)
+        std::cout << "pop empty\n";
+    this->_list.pop_front();
+}
+
+void    VM::dump(void)
+{
+    for (auto op : this->_list)
+        std::cout << op->toString() << std::endl;
+}
+        
+void    VM::add(void)
+{
+    std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
+    this->_list.push_front(*(op.first) + *(op.second));
+    delete op.first;
+    delete op.second;
+}
+
+void    VM::sub(void)
+{
+    std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
+    this->_list.push_front(*(op.first) - *(op.second));
+    delete op.first;
+    delete op.second;
+}
+
+void    VM::mul(void)
+{
+    std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
+    this->_list.push_front(*(op.first) * *(op.second));
+    delete op.first;
+    delete op.second;
+}
+
+void    VM::div(void)
+{
+    std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
+    this->_list.push_front(*(op.first) / *(op.second));
+    delete op.first;
+    delete op.second;
+}
+
+void    VM::mod(void)
+{
+    std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
+    this->_list.push_front(*(op.first) % *(op.second));
+    delete op.first;
+    delete op.second;
+}
+
+void    VM::print(void)
+{
+    if (this->_list.front()->getType() != AVM_INT8)
+        std::cout << "not char\n";
+    std::cout << static_cast<char>(this->_list.front()->toString()[0]);
+}
+
+void    VM::assert(void)
+{
+    std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
+    if (op.first->getType() != op.second->getType() || op.first->toString() != op.second->toString())
+        std::cout << "assertion failed\n";
+    delete op.first;
+    this->_list.push_front(op.second);
+}

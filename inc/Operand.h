@@ -71,7 +71,7 @@ template <typename T>
 eOperandType    Operand<T>::getType() const { return this->_type; }
 
 template <typename T>
-int             Operand<T>::getPrecision() const { return sizeof(this->_value) * 8; }
+int             Operand<T>::getPrecision() const { return (sizeof(this->_value) * 8) + (this->_type == AVM_FLOAT ? 1 : 0); }
 
 template <typename T>
 IOperand const *    Operand<T>::operator+( IOperand const & rhs ) const

@@ -9,11 +9,11 @@ int     main(int argc, char **argv)
 {
     (void)argc;
     std::list<Parser::token>    tokens = Parser::parseFile(argv[1]);
+    VM  vm;
 
     if (tokens.empty())
         return 1;
-    for (auto t : tokens)
-        std::cout << t.func << " " << t.value << "\n";
+    vm.exec(tokens);
 
     return 0;
 }
