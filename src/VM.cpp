@@ -120,6 +120,7 @@ void    VM::pop(void)
 {
     if (this->_list.size() == 0)
         std::cout << "pop empty\n";
+    delete this->_list.front();
     this->_list.pop_front();
 }
 
