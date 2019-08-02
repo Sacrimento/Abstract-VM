@@ -33,7 +33,6 @@ void            VM::exec(std::list<Parser::token> tokens)
 {
     for (auto t : tokens)
     {
-        // std::cout << t.func + " " + t.value + "\n";
         try
         {
             if (t.value.empty())
@@ -43,7 +42,7 @@ void            VM::exec(std::list<Parser::token> tokens)
         }
         catch(const std::exception& e)
         {
-            std::cerr << e.what() << '\n';
+            std::cerr << "Line " << t.line << ": " << e.what() << '\n';
             return;
         }
         
@@ -56,7 +55,7 @@ std::pair<IOperand const *, IOperand const *>   VM::getOperands(void)
     IOperand const *op2;
 
     if (this->_list.size() < 2)
-        std::cout << "less than 2\n";
+        throw StackTooSmallException();
 
     op1 = this->_list.front();
     this->_list.pop_front();
@@ -69,57 +68,57 @@ std::pair<IOperand const *, IOperand const *>   VM::getOperands(void)
 IOperand const  *VM::createInt8( std::string const & value ) const
 {
     double  val = std::atof(value.c_str());
-    // if (val > std::numeric_limits<char>::max())
-    //     throw VM::OverflowException();
-    // else if (val < std::numeric_limits<char>::lowest())
-    //     throw VM::UnderflowException();
+    if (val > std::numeric_limits<char>::max())
+        throw VM::OverflowException();
+    else if (val < std::numeric_limits<char>::lowest())
+        throw VM::UnderflowException();
     return new Operand<char>(static_cast<char>(val), AVM_INT8, this);
 }
 
 IOperand const  *VM::createInt16( std::string const & value ) const
 {
     double  val = std::atof(value.c_str());
-    // if (val > std::numeric_limits<short>::max())
-    //     throw VM::OverflowException();
-    // else if (val < std::numeric_limits<short>::lowest())
-    //     throw VM::UnderflowException();
+    if (val > std::numeric_limits<short>::max())
+        throw VM::OverflowException();
+    else if (val < std::numeric_limits<short>::lowest())
+        throw VM::UnderflowException();
     return new Operand<short>(static_cast<short>(val), AVM_INT16, this);
 }
 
 IOperand const  *VM::createInt32( std::string const & value ) const
 {
     double  val = std::atof(value.c_str());
-    // if (val > std::numeric_limits<int>::max())
-    //     throw VM::OverflowException();
-    // else if (val < std::numeric_limits<int>::lowest())
-    //     throw VM::UnderflowException();
+    if (val > std::numeric_limits<int>::max())
+        throw VM::OverflowException();
+    else if (val < std::numeric_limits<int>::lowest())
+        throw VM::UnderflowException();
     return new Operand<int>(static_cast<int>(val), AVM_INT32, this);
 }
 
 IOperand const  *VM::createFloat( std::string const & value ) const
 {
     double  val = std::atof(value.c_str());
-    // if (val > std::numeric_limits<float>::max())
-    //     throw VM::OverflowException();
-    // else if (val < std::numeric_limits<float>::lowest())
-    //     throw VM::UnderflowException();
+    if (val > std::numeric_limits<float>::max())
+        throw VM::OverflowException();
+    else if (val < std::numeric_limits<float>::lowest())
+        throw VM::UnderflowException();
     return new Operand<float>(static_cast<float>(val), AVM_FLOAT, this);
 }
 
 IOperand const  *VM::createDouble( std::string const & value ) const
 {
     double  val = std::atof(value.c_str());
-    // if (val > 0 && !std::isfinite(val))
-    //     throw VM::OverflowException();
-    // else if (val < 0 && !std::isfinite(val))
-    //     throw VM::UnderflowException();
+    if (val > 0 && !std::isfinite(val))
+        throw VM::OverflowException();
+    else if (val < 0 && !std::isfinite(val))
+        throw VM::UnderflowException();
     return new Operand<double>(val, AVM_DOUBLE, this);
 }
 
 void    VM::pop(void)
 {
     if (this->_list.size() == 0)
-        std::cout << "pop empty\n";
+        throw VM::PopEmptyException();
     delete this->_list.front();
     this->_list.pop_front();
 }
@@ -173,7 +172,7 @@ void    VM::mod(void)
 void    VM::print(void)
 {
     if (this->_list.front()->getType() != AVM_INT8)
-        std::cout << "not char\n";
+        throw VM::ValueNotInt8Exception();
     std::cout << static_cast<char>(this->_list.front()->toString()[0]);
 }
 
@@ -181,7 +180,37 @@ void    VM::assert(void)
 {
     std::pair<IOperand const *, IOperand const *>   op = this->getOperands();
     if (op.first->getType() != op.second->getType() || op.first->toString() != op.second->toString())
-        std::cout << "assertion failed\n";
+        throw VM::AssertionFailException();
     delete op.first;
     this->_list.push_front(op.second);
+}
+
+const char	*VM::OverflowException::what() const throw()
+{
+    return "value overflow";
+}
+
+const char	*VM::UnderflowException::what() const throw()
+{
+    return "value underflow";
+}
+
+const char	*VM::PopEmptyException::what() const throw()
+{
+    return "pop on empty stack";
+}
+
+const char	*VM::ValueNotInt8Exception::what() const throw()
+{
+    return "top of the stack is not an int8 value";
+}
+
+const char	*VM::AssertionFailException::what() const throw()
+{
+    return "assertion failed";
+}
+
+const char	*VM::StackTooSmallException::what() const throw()
+{
+    return "stack too small (less than 2 operands)";
 }

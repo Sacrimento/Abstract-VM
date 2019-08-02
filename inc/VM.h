@@ -53,6 +53,29 @@ class VM
                 virtual const char	*what() const throw();
         };
 
+        class PopEmptyException : public std::exception
+        {
+            public:
+                virtual const char	*what() const throw();
+        };
+
+        class ValueNotInt8Exception : public std::exception
+        {
+            public:
+                virtual const char	*what() const throw();
+        };
+
+        class AssertionFailException : public std::exception
+        {
+            public:
+                virtual const char	*what() const throw();
+        };
+
+        class StackTooSmallException : public std::exception
+        {
+            public:
+                virtual const char	*what() const throw();
+        };
 };
 
 #endif

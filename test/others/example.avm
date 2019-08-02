@@ -1,0 +1,9 @@
+push int8(42)
+push int8(33);test
+push
+assert int8(75)
+push int8(44)
+mul
+push int8(42)
+push int8(42)
+exit

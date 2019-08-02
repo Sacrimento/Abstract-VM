@@ -34,3 +34,5 @@ avm
 
 # Editor
 .vscode/
+
+.log

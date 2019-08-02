@@ -20,6 +20,16 @@ namespace Parser
 
     std::vector<std::string> const allowedCmds{"pop", "dump", "add", "sub", "mul", "div", "mod", "print"};
     std::vector<std::string> const allowedConstructor{"int8", "int16", "int32", "float", "double"};
+
+    class ParserException : public std::exception
+    {
+        private:
+            const char  *_err;
+
+        public:
+            ParserException(const char *err) throw();
+            virtual const char	*what() const throw();
+    };
 }
 
 #endif

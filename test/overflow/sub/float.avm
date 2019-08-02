@@ -1,0 +1,5 @@
+push float(2147483647)
+push float(2)
+sub
+exit
+

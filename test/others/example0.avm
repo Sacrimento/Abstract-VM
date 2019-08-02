@@ -1,0 +1,87 @@
+;-------------
+; sample.avm -
+; -------------
+
+push int8(42)
+push int8(33)
+dump
+print
+add
+print
+
+
+push int8(34)
+or
+print
+
+push int8(35)
+xor
+print
+
+push int8(36)
+and
+print
+
+push 			int16(42)
+push int16(33)
+push int8(10)
+print
+pop
+dump
+sub
+
+push int32(42)
+push int32(33)
+push int8(10)
+print
+pop
+dump
+mul
+
+push float(42.0)
+push float(33.0)
+push int8(10)
+print
+pop
+dump
+div
+
+push    		double(42.0)
+push double(33.0)
+push int8(10)
+print
+pop
+dump
+mod
+
+mul
+push int8(10)
+print
+pop
+dump
+
+div
+push int8(10)
+print
+pop
+dump
+
+add
+push int8(10)
+print
+pop
+dump
+add
+
+push float(44.55)
+mul
+push double(42.42)
+push int32(42)
+
+push int8(10)
+print
+pop
+dump
+pop
+assert double(42.42)
+exit
