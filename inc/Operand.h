@@ -30,12 +30,19 @@ class Operand : public IOperand
         IOperand const *    operator*( IOperand const & rhs ) const; // Product
         IOperand const *    operator/( IOperand const & rhs ) const; // Quotient
         IOperand const *    operator%( IOperand const & rhs ) const; // Modulo
+        IOperand const *    operator^( IOperand const & rhs ) const; // Xor
+        IOperand const *    operator&( IOperand const & rhs ) const; // And
+        IOperand const *    operator|( IOperand const & rhs ) const; // Or
         std::string const & toString( void ) const; // String representation of the instance
 
-        class DivisionByZeroException : public std::exception
+        class DivisionByZeroException : public std::logic_error
         {
             public:
-                virtual const char	*what() const throw();
+                DivisionByZeroException() : std::logic_error("divison by zero") {}
+                DivisionByZeroException(DivisionByZeroException const & src) : std::logic_error("divison by zero") { *this = src; }
+                DivisionByZeroException &operator=(DivisionByZeroException const &rhs) { std::logic_error::operator=(rhs); return *this; }
+                ~DivisionByZeroException() throw() {}
+                DivisionByZeroException(const std::string& what) : std::logic_error(what) {}
         };
         
 };
@@ -62,7 +69,9 @@ Operand<T> &    Operand<T>::operator=(Operand<T> const & rhs)
     if (this != &rhs)
     {
         this->_value = rhs._value;
+        this->_sValue = rhs._sValue;
         this->_type = rhs._type;
+        this->_vm = rhs._vm;
     }
     return *this;
 }
@@ -94,7 +103,7 @@ IOperand const *    Operand<T>::operator*( IOperand const & rhs ) const
 template <typename T>
 IOperand const *    Operand<T>::operator/( IOperand const & rhs ) const
 {
-    if (rhs.toString() == "0")
+    if (std::atof(rhs.toString().c_str()) == 0)
         throw Operand<T>::DivisionByZeroException();
     return this->_vm->createOperand((this->getPrecision() > rhs.getPrecision() ? this->getType() : rhs.getType()), std::to_string(std::atof(this->toString().c_str()) / std::atof(rhs.toString().c_str())));
 }
@@ -102,9 +111,27 @@ IOperand const *    Operand<T>::operator/( IOperand const & rhs ) const
 template <typename T>
 IOperand const *    Operand<T>::operator%( IOperand const & rhs ) const
 {
-    if (rhs.toString() == "0")
+    if (std::atof(rhs.toString().c_str()) == 0)
         throw Operand<T>::DivisionByZeroException();
     return this->_vm->createOperand((this->getPrecision() > rhs.getPrecision() ? this->getType() : rhs.getType()), std::to_string(fmod(std::atof(this->toString().c_str()), std::atof(rhs.toString().c_str()))));
+}
+
+template <typename T>
+IOperand const *    Operand<T>::operator^( IOperand const & rhs ) const
+{
+    return this->_vm->createOperand((this->getPrecision() > rhs.getPrecision() ? this->getType() : rhs.getType()), std::to_string(std::stoll(this->toString().c_str()) ^ std::stoll(rhs.toString().c_str())));
+}
+
+template <typename T>
+IOperand const *    Operand<T>::operator&( IOperand const & rhs ) const
+{
+    return this->_vm->createOperand((this->getPrecision() > rhs.getPrecision() ? this->getType() : rhs.getType()), std::to_string(std::stoll(this->toString().c_str()) & std::stoll(rhs.toString().c_str())));
+}
+
+template <typename T>
+IOperand const *    Operand<T>::operator|( IOperand const & rhs ) const
+{
+    return this->_vm->createOperand((this->getPrecision() > rhs.getPrecision() ? this->getType() : rhs.getType()), std::to_string(std::stoll(this->toString().c_str()) | std::stoll(rhs.toString().c_str())));
 }
 
 template <typename T>
@@ -112,11 +139,5 @@ std::string const & Operand<T>::toString( void ) const
 {
     return this->_sValue;
 }
-
-template <typename T>
-const char  *Operand<T>::DivisionByZeroException::what() const throw()
-{
-    return "Division by zero exception";
-}   
 
 #endif

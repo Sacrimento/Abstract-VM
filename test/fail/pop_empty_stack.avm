@@ -1,0 +1,3 @@
+; pop on an empty stack
+pop
+exit

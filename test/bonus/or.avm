@@ -1,0 +1,5 @@
+push int8(42)
+push int16(36)
+or ;46
+dump
+exit

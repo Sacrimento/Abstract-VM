@@ -1,0 +1,5 @@
+push int8(42)
+push double(36)
+xor ;14
+dump
+exit

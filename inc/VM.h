@@ -7,6 +7,7 @@
 #include <cmath>
 #include <map>
 #include <utility>
+#include <numeric>
 
 class VM
 {
@@ -24,6 +25,7 @@ class VM
         IOperand const *    createDouble( std::string const & value ) const;
 
         std::pair<IOperand const *, IOperand const *>   getOperands(void);
+        void    deleteOperands(IOperand const *, IOperand const *);
 
         void    pop(void);
         void    dump(void);
@@ -32,6 +34,12 @@ class VM
         void    mul(void);
         void    div(void);
         void    mod(void);
+        void    _xor(void);
+        void    _and(void);
+        void    _or(void);
+        void    max(void);
+        void    min(void);
+        void    avg(void);
         void    print(void);
         void    assert(void);
 
@@ -39,42 +47,66 @@ class VM
         VM();
         virtual ~VM();
         IOperand const *    createOperand( eOperandType type, std::string const & value ) const;
-        void                exec(std::list<Parser::token> tokens);
+        int                 exec(std::list<Parser::token> tokens);
 
-        class OverflowException : public std::exception
+        class AVM_OverflowException : public std::overflow_error
         {
             public:
-                virtual const char	*what() const throw();
+                AVM_OverflowException() : std::overflow_error("value overflow") {}
+                AVM_OverflowException(AVM_OverflowException const & src) : std::overflow_error("value overflow") { *this = src; }
+                AVM_OverflowException &operator=(AVM_OverflowException const &rhs) noexcept { std::overflow_error::operator=(rhs); return *this; }
+                ~AVM_OverflowException() throw() {}
+                AVM_OverflowException(const std::string& what) : std::overflow_error(what) {}
         };
 
-        class UnderflowException : public std::exception
+        class AVM_UnderflowException : public std::underflow_error
         {
             public:
-                virtual const char	*what() const throw();
+                AVM_UnderflowException() : std::underflow_error("value underflow") {}
+                AVM_UnderflowException(AVM_UnderflowException const & src) : std::underflow_error("value underflow") { *this = src; }
+                AVM_UnderflowException &operator=(AVM_UnderflowException const &rhs) { std::underflow_error::operator=(rhs); return *this; }
+                ~AVM_UnderflowException() throw() {}
+                AVM_UnderflowException(const std::string& what) : std::underflow_error(what) {}
         };
 
-        class PopEmptyException : public std::exception
+        class AVM_PopEmptyException : public std::runtime_error
         {
             public:
-                virtual const char	*what() const throw();
+                AVM_PopEmptyException() : std::runtime_error("pop on empty stack") {}
+                AVM_PopEmptyException(AVM_PopEmptyException const & src) : std::runtime_error("pop on empty stack") { *this = src; }
+                AVM_PopEmptyException &operator=(AVM_PopEmptyException const &rhs) { std::runtime_error::operator=(rhs); return *this; }
+                ~AVM_PopEmptyException() throw() {}
+                AVM_PopEmptyException(const std::string& what) : std::runtime_error(what) {}
         };
 
-        class ValueNotInt8Exception : public std::exception
+        class AVM_ValueNotInt8Exception : public std::runtime_error
         {
             public:
-                virtual const char	*what() const throw();
+                AVM_ValueNotInt8Exception() : std::runtime_error("top of the stack has not type int8") {}
+                AVM_ValueNotInt8Exception(AVM_ValueNotInt8Exception const & src) : std::runtime_error("top of the stack has not type int8") { *this = src; }
+                AVM_ValueNotInt8Exception &operator=(AVM_ValueNotInt8Exception const &rhs) { std::runtime_error::operator=(rhs); return *this; }
+                ~AVM_ValueNotInt8Exception() throw() {}
+                AVM_ValueNotInt8Exception(const std::string& what) : std::runtime_error(what) {}
         };
 
-        class AssertionFailException : public std::exception
+        class AVM_AssertionFailException : public std::runtime_error
         {
             public:
-                virtual const char	*what() const throw();
+                AVM_AssertionFailException() : std::runtime_error("assertion failed") {}
+                AVM_AssertionFailException(AVM_AssertionFailException const & src) : std::runtime_error("assertion failed") { *this = src; }
+                AVM_AssertionFailException &operator=(AVM_AssertionFailException const &rhs) { std::runtime_error::operator=(rhs); return *this; }
+                ~AVM_AssertionFailException() throw() {}
+                AVM_AssertionFailException(const std::string& what) : std::runtime_error(what) {}
         };
 
-        class StackTooSmallException : public std::exception
+        class AVM_StackTooSmallException : public std::runtime_error
         {
             public:
-                virtual const char	*what() const throw();
+                AVM_StackTooSmallException() : std::runtime_error("stack too small (less than 2 operands)") {}
+                AVM_StackTooSmallException(AVM_StackTooSmallException const & src) : std::runtime_error("stack too small (less than 2 operands)") { *this = src; }
+                AVM_StackTooSmallException &operator=(AVM_StackTooSmallException const &rhs) { std::runtime_error::operator=(rhs); return *this; }
+                ~AVM_StackTooSmallException() throw() {}
+                AVM_StackTooSmallException(const std::string& what) : std::runtime_error(what) {}
         };
 };
 

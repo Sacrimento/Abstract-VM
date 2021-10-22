@@ -1,0 +1,5 @@
+push int8(125)
+push int32(0)
+div
+exit
+exit

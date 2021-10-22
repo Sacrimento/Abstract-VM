@@ -1,0 +1,3 @@
+; mul on an empty stack
+mul
+exit

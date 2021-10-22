@@ -1,0 +1,3 @@
+; sub on an empty stack
+sub
+exit

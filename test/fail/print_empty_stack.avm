@@ -1,0 +1,3 @@
+; print on an empty stack
+print
+exit

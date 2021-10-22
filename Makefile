@@ -1,6 +1,6 @@
 NAME		=	avm
 FLAGS		= 	-std=c++17 -Wall -Werror -Wextra
-COMPILER	=	g++
+COMPILER	=	clang++
 
 DIR_INC		=	./inc/
 DIR_SRC		=	./src/

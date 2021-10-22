@@ -1,0 +1,5 @@
+; push with no arguments
+push
+push;int8(16)
+push ;int8(16)
+exit

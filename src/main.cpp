@@ -8,12 +8,11 @@ using namespace std;
 int     main(int argc, char **argv)
 {
     (void)argc;
-    std::list<Parser::token>    tokens = Parser::parseFile(argv[1]);
+    bool error = false;
+    std::list<Parser::token>    tokens = Parser::parse(argc, argv, error);
     VM  vm;
 
-    if (tokens.empty())
+    if (error)
         return 1;
-    vm.exec(tokens);
-
-    return 0;
+    return vm.exec(tokens);
 }
